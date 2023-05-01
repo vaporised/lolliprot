@@ -90,9 +90,6 @@ gene <- args[1] # Gene symbol
 path <- args[2] # Path to VCFs or path to RDS object
 current_path <- getwd()
 
-gene <- "DNMT3A"
-path <- "~/Google Drive/My Drive/garvan/CHIP/lolliplots/allchip_coding_gr.rds"
-
 # Get gene data
 ah <- AnnotationHub()
 edb <- ah[["AH98047"]]
