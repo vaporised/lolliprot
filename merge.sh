@@ -17,8 +17,6 @@ done
 bcftools merge $1/merged_*.vcf.temp.gz > merged.vcf
 
 # Clean up
-# rm *vcf.temp.gz
-#rm *vcf.temp.gz.tbi
 rm $1/*temp.gz
 rm $1/*temp.gz.tbi
 rm $1/*temp.gz.csi
