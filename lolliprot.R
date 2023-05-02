@@ -8,7 +8,6 @@ library("plyranges")
 library("drawProteins")
 library("mygene")
 library("AnnotationHub")
-library("parallel")
 
 # Return the abbreviation of a mutation
 getAbbrev <- function(ref_aa, loc, type, new_aa) {
@@ -52,54 +51,23 @@ stopIfError <- function(message, condition) {
   if (condition) {
     message()
     message(message)
-    options(show.error.messages = FALSE)
-    stop() 
+    stop(call. = FALSE) 
   }
 }
 
-loadVCFs <- function(path, subject, seqSource, cores) {
-  chr_only <- c("chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", 
-                "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", 
-                "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", 
-                "chrX", "chrY")
-  
-  if (endsWith(path, ".rds")) {
-    stopIfError("File does not exist", !file.exists(path))
-    gr <- readRDS(path)
-  } else {
-    stopIfError("Directory does not exist", !dir.exists(path))
-    setwd(path)
-    
-    vcf_list <- setdiff(list.files(pattern = "\\.vcf$"), list.dirs(recursive = FALSE, full.names = FALSE))
-    stopIfError("No VCFs in directory", length(vcf_list) == 0)
-    vcfs <- mclapply(vcf_list, mc.cores=cores, function(x) {
-      vcf <- readVcf(x, "hg38")
-      seqlevels(vcf) <- chr_only
-      
-      if (dim(vcf)[1] == 0) {
-        return(NULL)
-      }
-      return(vcf)
-    })
-    names(vcfs) <- seq_along(vcfs)
-    vcfs[sapply(vcfs, is.null)] <- NULL
-    
-    coding_list <- lapply(vcfs, function(x) predictCoding(x, txdb, Hsapiens))
-    gr <- unlist(as(coding_list, "GRangesList"))
-  }
-  return(gr)
-}
-
-# Args (1. gene name 2. path to vcfs or rds path 3. num cores to use for mc functions)
+# Get command-line args
 args <- commandArgs(trailingOnly = TRUE)
-stopIfError("Wrong number of arguments", (length(args) != 2) & (length(args) != 3))
+stopIfError("Wrong number of arguments", length(args) != 2)
 gene <- args[1] # Gene symbol
-path <- args[2] # Path to VCFs or RDS object
-cores <- 1
-if (length(args) == 3) {
-  cores <- args[3]
-  stopIfError("Number of cores should be a number greater than 1", (!all.equal(cores, as.integer(cores))) | (cores < 1 ) )
-}
+path_to_vcf <- args[2] # Path to VCF
+
+# Variables
+chr_only <- c("chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", 
+              "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", 
+              "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", 
+              "chrX", "chrY")
+txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
+hsapiens <- BSgenome.Hsapiens.UCSC.hg38
 current_path <- getwd()
 
 # Get gene data
@@ -111,8 +79,6 @@ stopIfError(paste(gene, "does not exist"), identical(gene_id, character(0)))
 transcripts <- transcripts(edb, filter = ~ tx_is_canonical == TRUE)
 transcript <- transcripts[transcripts$gene_id == gene_id]$tx_id_version # Transcript ID
 
-txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
-hsapiens <- BSgenome.Hsapiens.UCSC.hg38
 t <- transcripts(txdb, filter=list(tx_name = c(transcript)))
 tx_id <- t$tx_id[1] # tx_id
 chr <- as.character(t@seqnames) # Chromosome
@@ -123,16 +89,17 @@ gene_gr <- GRanges(chr, IRanges(t@ranges@start, t@ranges@start), names = c(gene)
 protein_gr <- GRanges(chr, IRanges(1, length), names = c(gene))
 output_filename <- paste(gene, "lolliprot.pdf", sep="_")
 
-# Read vcfs or read existing R file with loaded vcfs
-gr <- loadVCFs(path, txdb, Hsapiens, cores)
-
-# Save RDS of gr that can be used later
-dir.create(file.path(getwd(), "lolliprot_output"), showWarnings = FALSE)
-setwd(file.path(getwd(), "lolliprot_output"))
-saveRDS(gr, "lolliprot.rds") 
+# Load VCF and predict amino acid changes
+stopIfError("File given is not a VCF", !endsWith(path_to_vcf, ".vcf") & !endsWith(path_to_vcf, ".vcf.gz"))
+stopIfError("VCF given does not exist", !file.exists(path_to_vcf))
+vcf <- readVcf(path_to_vcf, "hg38")
+rownames(vcf) <- make.names(rownames(vcf), unique=TRUE)
+seqlevels(vcf) <- chr_only
+gr <- predictCoding(vcf, txdb, Hsapiens)
 
 # Get variants for selected transcript only
 txout_gr <- gr[gr$TXID == tx_id]
+names(txout_gr) <- make.names(names(txout_gr), unique=TRUE)
 
 # Stop if no variants
 stopIfError(paste("No mutations in", gene, sep = " "), length(txout_gr) == 0)
@@ -224,6 +191,8 @@ if (nrow(domains) == 0) {
 }
 
 # Plot
+dir.create(file.path(getwd(), "lolliprot_output"), showWarnings = FALSE)
+setwd(file.path(getwd(), "lolliprot_output"))
 pdf(output_filename, width = 16, height = 6)
 lolliplot(final_gr, features=domain_gr, ranges = protein_gr, 
           legend="CONSEQUENCE", xaxis=xaxis, yaxis = c(0, max(final_gr$score)), ylab=transcript)
