@@ -136,23 +136,24 @@ dupes <- site_merged_gr %>%
   plyranges::filter(n() > 1) %>%
   ungroup()
 
-# Remove these rows from the GRanges
-site_merged_gr <- as.data.frame(site_merged_gr)
-dupes <- as.data.frame(dupes)
-site_merged_gr <- site_merged_gr[!(rownames(site_merged_gr) %in% rownames(dupes)),]
-site_merged_gr <- as(site_merged_gr, "GRanges")
-dupes <- as(dupes, "GRanges")
+# Remove these rows from the gr, merge, and put back
+if (length(dupes) > 0) {
+  site_merged_gr <- as.data.frame(site_merged_gr)
+  dupes <- as.data.frame(dupes)
+  site_merged_gr <- site_merged_gr[!(rownames(site_merged_gr) %in% rownames(dupes)),]
+  site_merged_gr <- as(site_merged_gr, "GRanges")
+  dupes <- as(dupes, "GRanges")
+  merged <- dupes %>%
+    group_by(temp) %>%
+    mutate(abbrev_list = paste0(abbrev, collapse=", ")) %>%
+    mutate(score = n()) %>% 
+    mutate(CONSEQUENCE = getConsequence(CONSEQUENCE)) %>%
+    ungroup()
+  merged <- unique(unname(plyranges::select(merged, temp, CONSEQUENCE, abbrev_list, score)))
+  site_merged_gr <- plyranges::select(site_merged_gr, temp, CONSEQUENCE, abbrev_list, score)
+  site_merged_gr <- append(site_merged_gr, merged)
+}
 
-# Merge duplicate rows and put back into GRanges
-merged <- dupes %>%
-  group_by(temp) %>%
-  mutate(abbrev_list = paste0(abbrev, collapse=", ")) %>%
-  mutate(score = n()) %>% 
-  mutate(CONSEQUENCE = getConsequence(CONSEQUENCE)) %>%
-  ungroup()
-merged <- unique(unname(plyranges::select(merged, temp, CONSEQUENCE, abbrev_list, score)))
-site_merged_gr <- plyranges::select(site_merged_gr, temp, CONSEQUENCE, abbrev_list, score)
-site_merged_gr <- append(site_merged_gr, merged)
 
 # Change aesthetics of lollipop
 final_gr <- site_merged_gr
