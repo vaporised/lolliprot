@@ -1,3 +1,4 @@
+# Required libraries
 library("trackViewer")
 library("VariantAnnotation")
 library("TxDb.Hsapiens.UCSC.hg38.knownGene")
@@ -8,6 +9,8 @@ library("plyranges")
 library("drawProteins")
 library("mygene")
 library("AnnotationHub")
+
+# ----------------------- Functions -----------------------------#
 
 # Return the abbreviation of a mutation
 getAbbrev <- function(ref_aa, loc, type, new_aa) {
@@ -55,11 +58,14 @@ stopIfError <- function(message, condition) {
   }
 }
 
+
+# ------------------------- Main -------------------------------#
+
 # Get command-line args
 args <- commandArgs(trailingOnly = TRUE)
 stopIfError("Wrong number of arguments", length(args) != 2)
-gene <- args[1] # Gene symbol
-path_to_vcf <- args[2] # Path to VCF
+path_to_vcf <- args[1] # Path to VCF
+gene <- args[2] # Gene symbol
 
 # Variables
 chr_only <- c("chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", 
@@ -179,7 +185,7 @@ gene_data <- drawProteins::feature_to_dataframe(gene_json)
 domains <- gene_data[gene_data$type == "DOMAIN",]
 domain_gr <- NULL
 
-# No protein domains
+# If there are no protein domains
 if (nrow(domains) == 0) {
   domain_gr <- GRanges(chr, IRanges(c(1), width=c(1)))
   domain_gr$height <- 0
