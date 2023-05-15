@@ -154,7 +154,6 @@ if (length(dupes) > 0) {
   site_merged_gr <- append(site_merged_gr, merged)
 }
 
-
 # Change aesthetics of lollipop
 final_gr <- site_merged_gr
 
@@ -203,7 +202,7 @@ setwd(file.path(getwd(), "lolliprot_output"))
 pdf(output_filename, width = 16, height = 6)
 lolliplot(final_gr, features=domain_gr, ranges = protein_gr, 
           legend="CONSEQUENCE", xaxis=xaxis, yaxis = c(0, max(final_gr$score)), ylab=transcript)
-grid.text(gene, x=.5, y=.98, just="top", 
-          gp=gpar(cex=1.5, fontface="bold"))
+grid.text(gene, x=.5, y=.98, just="top", gp=gpar(cex=1.5, fontface="bold"))
+# grid.text(gene, x=.02, y=.55, just="centre", gp=gpar(cex=1.5, fontface="bold"))
 dev.off()
 
