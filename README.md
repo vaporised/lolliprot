@@ -20,3 +20,6 @@ Arguments:
    gene           Gene symbol of the gene to be plotted. 
                   The program uses the protein isoform encoded by the canonical transcript. 
 ```
+
+## Notes
+Multinucleotide variants are removed before plotting. The canonical transcript is used for plotting. Protein domains are represented as grey boxes.
