@@ -107,6 +107,9 @@ gr <- predictCoding(vcf, txdb, Hsapiens)
 txout_gr <- gr[gr$TXID == tx_id]
 names(txout_gr) <- make.names(names(txout_gr), unique=TRUE)
 
+# Remove multinucleotide variants
+txout_gr <- txout_gr[txout_gr$REF@ranges@width <= 1 | txout_gr$ALT@unlistData@ranges@width <= 1,]
+
 # Stop if no variants
 stopIfError(paste("No mutations in", gene, sep = " "), length(txout_gr) == 0)
 
@@ -203,6 +206,5 @@ pdf(output_filename, width = 16, height = 6)
 lolliplot(final_gr, features=domain_gr, ranges = protein_gr, 
           legend="CONSEQUENCE", xaxis=xaxis, yaxis = c(0, max(final_gr$score)), ylab=transcript)
 grid.text(gene, x=.5, y=.98, just="top", gp=gpar(cex=1.5, fontface="bold"))
-# grid.text(gene, x=.02, y=.55, just="centre", gp=gpar(cex=1.5, fontface="bold"))
 dev.off()
 
