@@ -22,4 +22,4 @@ Arguments:
 ```
 
 ## Notes
-Multinucleotide variants are removed before plotting. The canonical transcript is used for plotting. Protein domains are represented as grey boxes.
+Multinucleotide variants are removed before plotting. The canonical transcript is used for plotting. Protein domains are represented as grey boxes. The merge.sh script can be used to merge all vcf files in a directory.
