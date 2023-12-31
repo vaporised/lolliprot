@@ -1,0 +1,24 @@
+Package: lolliprot
+Type: Package
+Title: Protein Lollipop Plot
+Version: 0.1.0
+Author: vaporised
+Maintainer: Shannon <shannoneji@outlook.com>
+Description: Draws lollipop plots of proteins using genetic variant data.
+    Shows sites of amino acid changes, given a VCF file and a gene symbol. 
+License: Apache-2.0
+Encoding: UTF-8
+LazyData: true
+Depends:
+    dplyr
+Imports:
+    trackViewer,
+    VariantAnnotation,
+    TxDb.Hsapiens.UCSC.hg38.knownGene,
+    BSgenome.Hsapiens.UCSC.hg38,
+    Homo.sapiens,
+    plyranges,
+    drawProteins,
+    mygene,
+    AnnotationHub
+    
