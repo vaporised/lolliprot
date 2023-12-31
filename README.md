@@ -1,25 +1,41 @@
 # lolliprot
-A script for drawing lollipop plots of proteins using genetic variant data.
+R package for drawing lollipop plots of proteins using genetic variant data.
 
-This script draws lolliplots of genes showing sites of amino acid changes, given a VCF file and a gene symbol.
-Plots are saved into a `lolliprot_output` folder.
+Lolliplots show sites of amino acid changes, given a VCF file and a gene symbol.
 
 
 ![TET2 lolliprot](https://github.com/vaporised/lolliprot/blob/main/data/TET2_lolliprot.png)
 
 ## Pre-processing
-All variants to be plotted should be in one VCF file. If variants across multiple VCFs should be plotted, merge them first.
+All variants to be plotted should be in one VCF file. If variants across multiple VCFs should be plotted, merge them first. This can be done using the `./extdata/merged.sh` file.
 
 ## Usage
+```R
+plot_lolliprot(vcf_path, gene_symbol, remove_mnv = TRUE, to_pdf = FALSE)
 ```
-Usage:
-   Rscript lolliprot.R vcf_path gene
 
-Arguments:
-   vcf_path       Path to the VCF containing the sequence variants
-   gene           Gene symbol of the gene to be plotted. 
-                  The program uses the protein isoform encoded by the canonical transcript. 
-```
+## Arguments
+- **vcf_path**: Path to the VCF file containing variants to be plotted.
+- **gene_symbol**: Gene symbol of the gene to be plotted.
+- **remove_mnv**: If multinucleotide variants should be omitted when plotting. Defaults to TRUE.
+- **to_pdf**: If a PDF of the plot should be created instead in `./lolliprot_output`. Defaults to FALSE.
 
 ## Notes
-Multinucleotide variants are removed before plotting. The canonical transcript is used for plotting. Protein domains are represented as grey boxes. The merge.sh script can be used to merge all vcf files in a directory.
+The canonical transcript is used for plotting. Protein domains are represented as grey boxes. The GRCh38 assembly is used for reference.
+
+## Examples
+```R
+example_path <- system.file("extdata", "example.vcf", package="lolliprot")
+
+# Plot with the multinucleotide variant
+plot_lolliprot(vcf_path = example_path, gene_symbol = "DNMT3A", remove_mnv = FALSE)
+
+# Plot without the multinucleotide variant
+plot_lolliprot(vcf_path = example_path, gene_symbol = "DNMT3A")
+
+# Create a PDF
+plot_lolliprot(vcf_path = example_path, gene_symbol = "DNMT3A", to_pdf = TRUE)
+```
+## Installation
+```R
+devtools::install_github("vaporised/lolliprot")
