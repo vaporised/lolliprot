@@ -3,8 +3,7 @@ R package for drawing lollipop plots of proteins using genetic variant data.
 
 Lolliplots show sites of amino acid changes, given a VCF file and a gene symbol.
 
-
-![TET2 lolliprot](https://github.com/vaporised/lolliprot/blob/main/data/TET2_lolliprot.png)
+![TET2_lolliprot](https://github.com/vaporised/lolliprot/assets/86297267/af1e827d-56c6-433b-a149-f8f34e1fb432)
 
 ## Pre-processing
 All variants to be plotted should be in one VCF file. If variants across multiple VCFs should be plotted, merge them first. This can be done using the `./extdata/merged.sh` file.
