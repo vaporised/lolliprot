@@ -10,7 +10,7 @@ Plot Lolliprot
 Plots a lolliplot of a gene showing sites of amino acid changes, given a VCF file and a gene symbol.
 }
 \usage{
-plot_lolliprot(vcf_path, gene_symbol, remove_mnv = TRUE, to_pdf = FALSE)
+plot_lolliprot(vcf_path, gene_symbol, remove_mnv = TRUE, to_pdf = FALSE, width = 16, height = 6)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -25,6 +25,12 @@ If multinucleotide variants should be omitted when plotting. Defaults to TRUE
 }
 \item{to_pdf}{
 If a PDF of the plot should be created instead in \code{./lolliprot_output}. Defaults to FALSE
+}
+\item{width}{
+Width of the PDF. Defaults to 16.
+}
+\item{height}{
+Height of the PDF. Defaults to 6.
 }
 }
 \details{
@@ -64,7 +70,7 @@ plot_lolliprot(vcf_path = example_path, gene_symbol = "DNMT3A", remove_mnv = F)
 plot_lolliprot(vcf_path = example_path, gene_symbol = "DNMT3A")
 
 # Create a PDF
-plot_lolliprot(vcf_path = example_path, gene_symbol = "DNMT3A", to_pdf = T)
+plot_lolliprot(vcf_path = example_path, gene_symbol = "DNMT3A", to_pdf = TRUE, width = 15, height = 5)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory (show via RShowDoc("KEYWORDS")):

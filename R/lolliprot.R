@@ -49,7 +49,7 @@
 
 # ------------------------- Main -------------------------------#
 
-plot_lolliprot <- function(vcf_path, gene_symbol, remove_mnv = T, to_pdf = F) {
+plot_lolliprot <- function(vcf_path, gene_symbol, remove_mnv = T, to_pdf = F, width = 16, height = 6) {
   chr_only <- c("chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8",
                 "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15",
                 "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22",
@@ -172,7 +172,7 @@ plot_lolliprot <- function(vcf_path, gene_symbol, remove_mnv = T, to_pdf = F) {
 
   # If there are no protein domains
   if (nrow(domains) == 0) {
-    domain_gr <- GenomicRanges::GenomicRanges(chr, IRanges::IRanges(c(1), width=c(1)))
+    domain_gr <- GenomicRanges::GRanges(chr, IRanges::IRanges(c(1), width=c(1)))
     domain_gr$height <- 0
   } else {
     domains$chr <- chr
@@ -184,10 +184,9 @@ plot_lolliprot <- function(vcf_path, gene_symbol, remove_mnv = T, to_pdf = F) {
   # Plot
   if (to_pdf) {
     output_filename <- paste(gene_symbol, "lolliprot.pdf", sep="_")
-
-    dir.create(file.path(getwd(), "lolliprot_output"), showWarnings = FALSE)
-    setwd(file.path(getwd(), "lolliprot_output"))
-    pdf(output_filename, width = 16, height = 6)
+    file_path <- file.path(getwd(), "lolliprot_output")
+    dir.create(file_path, showWarnings = FALSE)
+    pdf(paste(file_path, output_filename, sep="/"), width = width, height = height)
     trackViewer::lolliplot(final_gr, features=domain_gr, ranges = protein_gr,
                            legend="CONSEQUENCE", xaxis=xaxis, yaxis = c(0, max(final_gr$score)), ylab=transcript)
     grid::grid.text(gene_symbol, x=.5, y=.98, just="top", gp=grid::gpar(cex=1.5, fontface="bold"))
@@ -197,5 +196,7 @@ plot_lolliprot <- function(vcf_path, gene_symbol, remove_mnv = T, to_pdf = F) {
                            legend="CONSEQUENCE", xaxis=xaxis, yaxis = c(0, max(final_gr$score)), ylab=transcript)
     grid::grid.text(gene_symbol, x=.5, y=.98, just="top", gp=grid::gpar(cex=1.5, fontface="bold"))
   }
+
+  RSQLite::dbDisconnect(dbconn(ah))
 }
 

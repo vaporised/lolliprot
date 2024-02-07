@@ -10,7 +10,7 @@ All variants to be plotted should be in one VCF file. If variants across multipl
 
 ## Usage
 ```R
-plot_lolliprot(vcf_path, gene_symbol, remove_mnv = TRUE, to_pdf = FALSE)
+plot_lolliprot(vcf_path, gene_symbol, remove_mnv = TRUE, to_pdf = FALSE, width = 16, height = 6)
 ```
 
 ## Arguments
@@ -18,6 +18,8 @@ plot_lolliprot(vcf_path, gene_symbol, remove_mnv = TRUE, to_pdf = FALSE)
 - **gene_symbol**: Gene symbol of the gene to be plotted.
 - **remove_mnv**: If multinucleotide variants should be omitted when plotting. Defaults to TRUE.
 - **to_pdf**: If a PDF of the plot should be created instead in `./lolliprot_output`. Defaults to FALSE.
+- **width**: Width of the PDF. Defaults to 16.
+- **height**: Height of the PDF. Defaults to 6.
 
 ## Notes
 The canonical transcript is used for plotting. Protein domains are represented as grey boxes. The GRCh38 assembly is used for reference.
@@ -33,8 +35,9 @@ plot_lolliprot(vcf_path = example_path, gene_symbol = "DNMT3A", remove_mnv = FAL
 plot_lolliprot(vcf_path = example_path, gene_symbol = "DNMT3A")
 
 # Create a PDF
-plot_lolliprot(vcf_path = example_path, gene_symbol = "DNMT3A", to_pdf = TRUE)
+plot_lolliprot(vcf_path = example_path, gene_symbol = "DNMT3A", to_pdf = TRUE, width = 15, height = 5)
 ```
+
 ## Installation
 ```R
 devtools::install_github("vaporised/lolliprot")
